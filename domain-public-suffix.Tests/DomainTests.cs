@@ -112,6 +112,26 @@ namespace DomainPublicSuffix.Tests
             Assert.IsTrue(t1*0.66 > t2);
         }
 
+        [TestMethod]
+        public void ParseNormalDomainWhereTLDOccursInDomain()
+        {
+            //  Try parsing a 'normal' domain where the TLD part also occurs in the domain part
+            DomainName.TryParse("russian.cntv.cn", out outDomain);
+
+            //  The domain should be parsed as 'cntv'
+            Assert.AreEqual<string>("cntv", outDomain.Domain);
+        }
+
+        [TestMethod]
+        public void ParseWildcardDomainWhereTLDOccursInDomain()
+        {
+            //  Try parsing a 'wildcard' domain where the TLD part also occurs in the domain part
+            DomainName.TryParse("com.er.com.er", out outDomain);
+
+            //  The domain should be parsed as 'er'
+            Assert.AreEqual<string>("er", outDomain.Domain);
+        }
+
         // Mixed case.
         [TestMethod]
         public void StandardTest1()
