@@ -248,22 +248,22 @@ namespace DomainPublicSuffix.Tests
         [TestMethod]
         public void StandardTest25()
         {
-            checkPublicSuffix("cy", null);
+            checkPublicSuffix("bd", null);
         }
         [TestMethod]
         public void StandardTest26()
         {
-            checkPublicSuffix("c.cy", null);
+            checkPublicSuffix("c.bd", null);
         }
         [TestMethod]
         public void StandardTest27()
         {
-            checkPublicSuffix("b.c.cy", "b.c.cy");
+            checkPublicSuffix("b.c.bd", "b.c.bd");
         }
         [TestMethod]
         public void StandardTest28()
         {
-            checkPublicSuffix("a.b.c.cy", "b.c.cy");
+            checkPublicSuffix("a.b.c.bd", "b.c.bd");
         }
 
 
