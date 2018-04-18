@@ -34,9 +34,12 @@ namespace DomainPublicSuffix
         /// <param name="RuleInfo"></param>
         public TLDRule(string RuleInfo)
         {
-            //TODO: Publicsuffix.org spec says a wildcard can be contained at any level not
-            // just the left-most. As of May 2015 there are no examples of such a rule but
-            // we may need to come up with a more complex matching algorithm in future.
+            // Publicsuffix.org spec says a wildcard can be contained at any level not
+            // just the left-most. As of Apr 2018 there are no examples of such a rule.
+            // According to https://github.com/publicsuffix/list/issues/145 it is 
+            // highly likely that we will never need to implement support for this and
+            // that the offical spec will be changed to match the reality of our
+            // current implementation.
 
             //  Parse the rule and set properties accordingly:
             if (RuleInfo.StartsWith("*", StringComparison.InvariantCultureIgnoreCase))
@@ -47,7 +50,7 @@ namespace DomainPublicSuffix
             else if (RuleInfo.StartsWith("!", StringComparison.InvariantCultureIgnoreCase))
             {
                 this.Type = RuleType.Exception;
-                this.Name = RuleInfo.Substring(1,RuleInfo.IndexOf('.')-1);
+                this.Name = RuleInfo.Substring(1);
             }
             else
             {
@@ -76,9 +79,9 @@ namespace DomainPublicSuffix
         public enum RuleType
         {
             /// <summary>
-            /// A normal rule
+            /// An exception rule, as defined by www.publicsuffix.org
             /// </summary>
-            Normal,
+            Exception,
 
             /// <summary>
             /// A wildcard rule, as defined by www.publicsuffix.org
@@ -86,10 +89,10 @@ namespace DomainPublicSuffix
             Wildcard,
 
             /// <summary>
-            /// An exception rule, as defined by www.publicsuffix.org
+            /// A normal rule
             /// </summary>
-            Exception
-        } 
+            Normal
+        }
 
         #endregion
     }
