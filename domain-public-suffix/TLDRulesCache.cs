@@ -16,14 +16,13 @@ namespace DomainPublicSuffix
         private static volatile TLDRulesCache _uniqueInstance;
         private static object _syncObj = new object();
         private static object _syncList = new object();
-        private List<TLDRule> _lstTLDRules;
+        private IDictionary<TLDRule.RuleType, IDictionary<string, TLDRule>> _dicTLDRules;
         private static string _suffixRulesFileLocation;
 
         private TLDRulesCache()
         {
-            //  Initialize our internal list:
-            _lstTLDRules = GetTLDRules();
-            _lstTLDRules.Sort();
+            //  Initialize our internal dictionary
+            _dicTLDRules = GetTLDRules();
         }
 
         /// <summary>
@@ -58,17 +57,21 @@ namespace DomainPublicSuffix
         }
 
         /// <summary>
-        /// List of TLD rules
+        /// Dictionary of TLD rules
         /// </summary>
-        public List<TLDRule> TLDRuleList
+        public IDictionary<TLDRule.RuleType, IDictionary<string, TLDRule>> TLDRuleLists
         {
             get
             {
-                return _lstTLDRules;
+                if (_dicTLDRules == null)
+                {
+                    _dicTLDRules = GetTLDRules();
+                }
+                return _dicTLDRules;
             }
             set
             {
-                _lstTLDRules = value;
+                _dicTLDRules = value;
             }
         }
 
@@ -88,23 +91,32 @@ namespace DomainPublicSuffix
         /// Gets the list of TLD rules from the cache
         /// </summary>
         /// <returns></returns>
-        private List<TLDRule> GetTLDRules()
+        private IDictionary<TLDRule.RuleType, IDictionary<string, TLDRule>> GetTLDRules()
         {
             try
             {
+                var results = new Dictionary<TLDRule.RuleType, IDictionary<string, TLDRule>>();
+                var ruleTypes = (TLDRule.RuleType[])Enum.GetValues(typeof(TLDRule.RuleType));
+
+                foreach (var ruleType in ruleTypes)
+                {
+                    results[ruleType] = new Dictionary<string, TLDRule>(StringComparer.InvariantCultureIgnoreCase);
+                }
+
                 var ruleStrings = ReadRulesData();
 
-                List<TLDRule> lstTLDRules = new List<TLDRule>(7000);
                 foreach (var ruleString in ruleStrings)
-                    lstTLDRules.Add(new TLDRule(ruleString));
+                {
+                    var result = new TLDRule(ruleString);
+                    results[result.Type][result.Name] = result;
+                }
 
-                //  Return our results:
-                Debug.WriteLine(string.Format("Loaded {0} rules into cache.", lstTLDRules.Count));
-                return lstTLDRules;
+                // Return our results
+                return results;
             }
             catch (Exception)
             {
-                return new List<TLDRule>();
+                return new Dictionary<TLDRule.RuleType, IDictionary<string, TLDRule>>();
             }
         }
 
