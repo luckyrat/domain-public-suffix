@@ -316,6 +316,9 @@ namespace DomainPublicSuffix
             // Our 'matches' collection
             List<TLDRule> ruleMatches = new List<TLDRule>();
 
+            var ruleTypes = (TLDRule.RuleType[])Enum.GetValues(typeof(TLDRule.RuleType));
+            var ruleList = TLDRulesCache.Instance.TLDRuleLists;
+
             foreach (string domainPart in lstDomainParts)
             {
                 // Add on our next domain part
@@ -324,9 +327,6 @@ namespace DomainPublicSuffix
                 // If we end in a period, strip it off
                 if (checkAgainst.EndsWith("."))
                     checkAgainst = checkAgainst.Substring(0, checkAgainst.Length - 1);
-
-                var ruleTypes = (TLDRule.RuleType[])Enum.GetValues(typeof(TLDRule.RuleType));
-                var ruleList = TLDRulesCache.Instance.TLDRuleLists;
 
                 foreach (var ruleType in ruleTypes)
                 {
