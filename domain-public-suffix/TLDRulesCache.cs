@@ -161,7 +161,7 @@ namespace DomainPublicSuffix
             using (var cacheFile = File.CreateText(_suffixRulesFileLocation))
             {
                 WebClient fileReader = new WebClient();
-                string publicSuffixURL = "https://publicsuffix.org/list/effective_tld_names.dat";
+                string publicSuffixURL = "https://publicsuffix.org/list/public_suffix_list.dat";
                 using (Stream datFile = fileReader.OpenRead(publicSuffixURL))
                 {
                     using (var reader = new StreamReader(datFile))
