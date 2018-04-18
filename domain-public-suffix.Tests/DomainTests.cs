@@ -90,7 +90,19 @@ namespace DomainPublicSuffix.Tests
         public void ParseExceptionDomain()
         {
             DomainName.TryParse("example.city.kawasaki.jp", out outDomain);
-            Assert.AreEqual<string>("example", outDomain.Domain);
+            Assert.AreEqual<string>("city", outDomain.Domain);
+            Assert.AreEqual<string>("example", outDomain.SubDomain);
+            Assert.AreEqual<string>("city.kawasaki.jp", outDomain.RegistrableDomain);
+        }
+
+        [TestMethod]
+        public void ParseExceptionDomainWhereTLDOccursInSubdomain()
+        {
+            //  Try parsing an 'exception' domain where the TLD part also occurs in the subdomain part
+            DomainName.TryParse("www.ck.www.ck", out outDomain);
+
+            //  The domain should be parsed as 'www'
+            Assert.AreEqual<string>("www", outDomain.Domain);
         }
 
         [TestMethod]
@@ -123,6 +135,22 @@ namespace DomainPublicSuffix.Tests
         }
 
         [TestMethod]
+        public void ParseWildcardDomain()
+        {
+            //  Try parsing a 'wildcard' domain
+            DomainName.TryParse("photos.verybritish.co.uk", out outDomain);
+
+            //  The domain should be parsed as 'verybritish'
+            Assert.AreEqual<string>("verybritish", outDomain.Domain);
+
+            //  The TLD is 'co.uk'
+            Assert.AreEqual<string>("co.uk", outDomain.TLD);
+            
+            //  The subdomain is everything else to the left of the domain:
+            Assert.AreEqual<string>("photos", outDomain.SubDomain);
+        }
+
+        [TestMethod]
         public void ParseWildcardDomainWhereTLDOccursInDomain()
         {
             //  Try parsing a 'wildcard' domain where the TLD part also occurs in the domain part
@@ -132,6 +160,26 @@ namespace DomainPublicSuffix.Tests
             Assert.AreEqual<string>("er", outDomain.Domain);
         }
 
+        [TestMethod]
+        public void ParsePrivateWildcardDomain()
+        {
+            DomainName.TryParse("my.fun.test.compute.amazonaws.com.cn", out outDomain);
+
+            Assert.AreEqual<string>("fun", outDomain.Domain);
+            Assert.AreEqual<string>("test.compute.amazonaws.com.cn", outDomain.TLD);
+            Assert.AreEqual<string>("my", outDomain.SubDomain);
+        }
+
+        [TestMethod]
+        public void ParsePrivateDomain()
+        {
+            DomainName.TryParse("my.fun.test.us-east-1.amazonaws.com", out outDomain);
+
+            Assert.AreEqual<string>("test", outDomain.Domain);
+            Assert.AreEqual<string>("us-east-1.amazonaws.com", outDomain.TLD);
+            Assert.AreEqual<string>("my.fun", outDomain.SubDomain);
+        }
+        
         // Mixed case.
         [TestMethod]
         public void StandardTest1()
@@ -268,22 +316,22 @@ namespace DomainPublicSuffix.Tests
         [TestMethod]
         public void StandardTest25()
         {
-            checkPublicSuffix("bd", null);
+            checkPublicSuffix("mm", null);
         }
         [TestMethod]
         public void StandardTest26()
         {
-            checkPublicSuffix("c.bd", null);
+            checkPublicSuffix("c.mm", null);
         }
         [TestMethod]
         public void StandardTest27()
         {
-            checkPublicSuffix("b.c.bd", "b.c.bd");
+            checkPublicSuffix("b.c.mm", "b.c.mm");
         }
         [TestMethod]
         public void StandardTest28()
         {
-            checkPublicSuffix("a.b.c.bd", "b.c.bd");
+            checkPublicSuffix("a.b.c.mm", "b.c.mm");
         }
 
 
@@ -361,12 +409,12 @@ namespace DomainPublicSuffix.Tests
         [TestMethod]
         public void StandardTest43()
         {
-            checkPublicSuffix("city.kobe.jp", null);
+            checkPublicSuffix("city.kobe.jp", "city.kobe.jp");
         }
         [TestMethod]
         public void StandardTest44()
         {
-            checkPublicSuffix("www.city.kobe.jp", "www.city.kobe.jp");
+            checkPublicSuffix("www.city.kobe.jp", "city.kobe.jp");
         }
 
 
@@ -394,14 +442,13 @@ namespace DomainPublicSuffix.Tests
         [TestMethod]
         public void StandardTest49()
         {
-            checkPublicSuffix("www.ck", null);
+            checkPublicSuffix("www.ck", "www.ck");
         }
         [TestMethod]
         public void StandardTest50()
         {
-            checkPublicSuffix("www.www.ck", "www.www.ck");
+            checkPublicSuffix("www.www.ck", "www.ck");
         }
-
 
         // US K12.
         [TestMethod]
@@ -500,76 +547,74 @@ namespace DomainPublicSuffix.Tests
 
 
         // Same as above, but punycoded.
-        //[TestMethod]
-        //public void StandardTest69()
-        //{
-        //    checkPublicSuffix("xn--85x722f.com.cn", "xn--85x722f.com.cn");
-        //}
-        //[TestMethod]
-        //public void StandardTest70()
-        //{
-        //    checkPublicSuffix("xn--85x722f.xn--55qx5d.cn", "xn--85x722f.xn--55qx5d.cn");
-        //}
-        //[TestMethod]
-        //public void StandardTest71()
-        //{
-        //    checkPublicSuffix("www.xn--85x722f.xn--55qx5d.cn", "xn--85x722f.xn--55qx5d.cn");
-        //}
-        //[TestMethod]
-        //public void StandardTest72()
-        //{
-        //    checkPublicSuffix("shishi.xn--55qx5d.cn", "shishi.xn--55qx5d.cn");
-        //}
-        //[TestMethod]
-        //public void StandardTest73()
-        //{
-        //    checkPublicSuffix("xn--55qx5d.cn", null);
-        //}
-        //[TestMethod]
-        //public void StandardTest74()
-        //{
-        //    checkPublicSuffix("xn--85x722f.xn--fiqs8s", "xn--85x722f.xn--fiqs8s");
-        //}
-        //[TestMethod]
-        //public void StandardTest75()
-        //{
-        //    checkPublicSuffix("www.xn--85x722f.xn--fiqs8s", "xn--85x722f.xn--fiqs8s");
-        //}
-        //[TestMethod]
-        //public void StandardTest76()
-        //{
-        //    checkPublicSuffix("shishi.xn--fiqs8s", "shishi.xn--fiqs8s");
-        //}
-        //[TestMethod]
-        //public void StandardTest77()
-        //{
-        //    checkPublicSuffix("xn--fiqs8s", null);
-        //}
+        [TestMethod]
+        public void StandardTest69()
+        {
+            checkPublicSuffix("xn--85x722f.com.cn", "xn--85x722f.com.cn");
+        }
+        [TestMethod]
+        public void StandardTest70()
+        {
+            checkPublicSuffix("xn--85x722f.xn--55qx5d.cn", "xn--85x722f.xn--55qx5d.cn");
+        }
+        [TestMethod]
+        public void StandardTest71()
+        {
+            checkPublicSuffix("www.xn--85x722f.xn--55qx5d.cn", "xn--85x722f.xn--55qx5d.cn");
+        }
+        [TestMethod]
+        public void StandardTest72()
+        {
+            checkPublicSuffix("shishi.xn--55qx5d.cn", "shishi.xn--55qx5d.cn");
+        }
+        [TestMethod]
+        public void StandardTest73()
+        {
+            checkPublicSuffix("xn--55qx5d.cn", null);
+        }
+        [TestMethod]
+        public void StandardTest74()
+        {
+            checkPublicSuffix("xn--85x722f.xn--fiqs8s", "xn--85x722f.xn--fiqs8s");
+        }
+        [TestMethod]
+        public void StandardTest75()
+        {
+            checkPublicSuffix("www.xn--85x722f.xn--fiqs8s", "xn--85x722f.xn--fiqs8s");
+        }
+        [TestMethod]
+        public void StandardTest76()
+        {
+            checkPublicSuffix("shishi.xn--fiqs8s", "shishi.xn--fiqs8s");
+        }
+        [TestMethod]
+        public void StandardTest77()
+        {
+            checkPublicSuffix("xn--fiqs8s", null);
+        }
 
 
         // Unlisted TLD.
-        //[TestMethod]
-        //public void StandardTest8()
-        //{
-        //    checkPublicSuffix("example", null);
-        //}
-        //[TestMethod]
-        //public void StandardTest9()
-        //{
-        //    checkPublicSuffix("example.example", "example.example");
-        //}
-        //[TestMethod]
-        //public void StandardTest10()
-        //{
-        //    checkPublicSuffix("b.example.example", "example.example");
-        //}
-        //[TestMethod]
-        //public void StandardTest11()
-        //{
-        //    checkPublicSuffix("a.b.example.example", "example.example");
-        //}
-
-
+        [TestMethod]
+        public void StandardTest78()
+        {
+            checkPublicSuffix("example", null);
+        }
+        [TestMethod]
+        public void StandardTest79()
+        {
+            checkPublicSuffix("example.example", "example.example");
+        }
+        [TestMethod]
+        public void StandardTest80()
+        {
+            checkPublicSuffix("b.example.example", "example.example");
+        }
+        [TestMethod]
+        public void StandardTest81()
+        {
+            checkPublicSuffix("a.b.example.example", "example.example");
+        }
 
         private void checkPublicSuffix(string p1, string p2)
         {
