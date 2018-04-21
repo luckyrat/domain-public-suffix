@@ -125,6 +125,30 @@ namespace DomainPublicSuffix.Tests
         }
 
         [TestMethod]
+        public void RepeatedNormalLookupIsCorrect()
+        {
+            DomainName outDomain2 = null;
+            DomainName outDomain3 = null;
+            DomainName.TryParse("www.kee.pm", out outDomain);
+            DomainName.TryParse("www.kee.pm", out outDomain2);
+            DomainName.TryParse("www.kee.pm", out outDomain3);
+            Assert.AreEqual<string>(outDomain2.RegistrableDomain, outDomain.RegistrableDomain);
+            Assert.AreEqual<string>(outDomain2.RegistrableDomain, outDomain3.RegistrableDomain);
+        }
+
+        [TestMethod]
+        public void RepeatedPrivateLookupIsCorrect()
+        {
+            DomainName outDomain2 = null;
+            DomainName outDomain3 = null;
+            DomainName.TryParse("www.kee.notatld", out outDomain);
+            DomainName.TryParse("www.kee.notatld", out outDomain2);
+            DomainName.TryParse("www.kee.notatld", out outDomain3);
+            Assert.AreEqual<string>(outDomain2.RegistrableDomain, outDomain.RegistrableDomain);
+            Assert.AreEqual<string>(outDomain2.RegistrableDomain, outDomain3.RegistrableDomain);
+        }
+
+        [TestMethod]
         public void ParseNormalDomainWhereTLDOccursInDomain()
         {
             //  Try parsing a 'normal' domain where the TLD part also occurs in the domain part

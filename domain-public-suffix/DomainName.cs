@@ -172,9 +172,9 @@ namespace DomainPublicSuffix
                 unicodeString = idn.GetUnicode(domainString);
             }
 
-            TLDRule fromCache = DomainCache.Get(unicodeString);
             List<string> allParts;
-            if (fromCache != null)
+            TLDRule fromCache = null;
+            if (DomainCache.TryGet(unicodeString, out fromCache))
             {
                 MatchingRule = fromCache;
                 allParts = new List<string>(unicodeString.Split('.'));
