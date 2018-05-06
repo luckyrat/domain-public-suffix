@@ -3,10 +3,10 @@ using System.Diagnostics;
 
 namespace DomainPublicSuffix.Tests
 {
-	/// <summary>
-	/// Summary description for DomainTests
-	/// </summary>
-	[TestFixture]
+    /// <summary>
+    /// Summary description for DomainTests
+    /// </summary>
+    [TestFixture]
     public class DomainTests
     {
         private DomainName outDomain = null;
