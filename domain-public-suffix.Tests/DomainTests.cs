@@ -1,5 +1,7 @@
 ﻿using NUnit.Framework;
+using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace DomainPublicSuffix.Tests
 {
@@ -14,7 +16,13 @@ namespace DomainPublicSuffix.Tests
 		[OneTimeSetUp]
         public static void MyClassInitialize()
         {
-            TLDRulesCache.Init(@"C:\temp\publicSuffixDomainCache.txt");
+            var url = "https://publicsuffix.org/list/public_suffix_list.dat";
+            var cacheFile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string directorySeparatorChar = Path.DirectorySeparatorChar.ToString();
+            if (!cacheFile.EndsWith(directorySeparatorChar, StringComparison.Ordinal)) cacheFile += directorySeparatorChar;
+            cacheFile = cacheFile + "publicSuffixDomainCache.txt";
+            Console.WriteLine("Cache file: " + cacheFile);
+            TLDRulesCache.Init(cacheFile, url);
         }
 
         #region Additional test attributes

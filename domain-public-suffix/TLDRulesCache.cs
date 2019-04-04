@@ -18,6 +18,7 @@ namespace DomainPublicSuffix
         private static object _syncList = new object();
         private IDictionary<TLDRule.RuleType, IDictionary<string, TLDRule>> _dicTLDRules;
         private static string _suffixRulesFileLocation;
+        private static string _suffixRulesURL;
 
         private TLDRulesCache()
         {
@@ -32,9 +33,15 @@ namespace DomainPublicSuffix
         /// have access to that configuration
         /// </summary>
         /// <param name="fileName"></param>
-        public static void Init (string fileName)
+        public static void Init (string fileName, string url)
         {
             _suffixRulesFileLocation = fileName;
+            _suffixRulesURL = url;
+        }
+
+        public static void Init(string fileName)
+        {
+            Init(fileName, "https://publicsuffix.org/list/public_suffix_list.dat");
         }
 
         /// <summary>
@@ -161,7 +168,7 @@ namespace DomainPublicSuffix
             using (var cacheFile = File.CreateText(_suffixRulesFileLocation))
             {
                 WebClient fileReader = new WebClient();
-                string publicSuffixURL = "https://publicsuffix.org/list/public_suffix_list.dat";
+                string publicSuffixURL = _suffixRulesURL;
                 using (Stream datFile = fileReader.OpenRead(publicSuffixURL))
                 {
                     using (var reader = new StreamReader(datFile))
